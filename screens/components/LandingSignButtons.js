@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React from 'react'
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '../../colors/colors'
 
 const LandingSignButtons = ({ title, onPress, type, style, ...props }) => {
 
-    console.log('style', style);
 
     const buttonStyle = type === 'signin' ? styles.signinButton : styles.signupButton
     return (
@@ -14,7 +14,7 @@ const LandingSignButtons = ({ title, onPress, type, style, ...props }) => {
                     onPress={onPress}
                     style={[buttonStyle, buttonStyle]}
                 >
-                    <Text style={{ color: '#ffffff' }}>{title}</Text>
+                    <Text style={{ color: type === 'signin' ? SECONDARY_COLOR : PRIMARY_COLOR }}>{title}</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         width: 150,
         height: 50,
-        backgroundColor: '#000000',
+        backgroundColor: PRIMARY_COLOR,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         width: 150,
         height: 50,
-        backgroundColor: 'gray',
+        backgroundColor: '#fff',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center', borderWidth: 1, borderColor: '#003096'
     }
 })

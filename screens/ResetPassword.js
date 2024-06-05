@@ -6,13 +6,14 @@ import SecondaryDescText from './components/SecondaryDescText'
 import PassInputFields from './components/PassInputFields'
 import SocialSignButton from './components/SocialSignButton'
 import UpdatePassScreen from './UpdatePassScreen'
+import { PRIMARY_COLOR } from '../colors/colors'
 
 const ResetPassword = ({ navigation }) => {
     const [visibleNewPassword, setVisibleNewPassword] = useState(false)
     const handleOnReset = () => {
         navigation.navigate(UpdatePassScreen)
     }
-    
+
     return (
         <View style={styles.container}>
             <View style={{ width: 300 }}>
@@ -26,7 +27,7 @@ const ResetPassword = ({ navigation }) => {
                     <PassInputFields label={'Confirm Password'} placeholder={'enter Confirm password '} style={{ width: 300 }} />
 
                 </View>
-                <SocialSignButton label={'Update Password'} color={'white'} style={{ width: 300 }} onPress={handleOnReset} />
+                <SocialSignButton label={'Update Password'} color={'white'} style={{ width: 300, backgroundColor: PRIMARY_COLOR }} onPress={handleOnReset} />
             </View>
         </View>
     )

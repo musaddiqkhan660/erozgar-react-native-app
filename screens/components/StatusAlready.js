@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React from 'react'
+import { PRIMARY_COLOR } from '../../colors/colors'
 
 const StatusAlready = ({ text, typeText, onPress }) => {
     return (
@@ -8,7 +9,7 @@ const StatusAlready = ({ text, typeText, onPress }) => {
                 {text}
             </Text>
             <TouchableOpacity onPress={onPress} >
-                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 12, color: PRIMARY_COLOR }}>
                     {typeText}
                 </Text>
             </TouchableOpacity>

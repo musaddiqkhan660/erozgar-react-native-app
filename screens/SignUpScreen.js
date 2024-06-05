@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import SignInScreen from './SignInScreen'
@@ -8,17 +8,48 @@ import PassInputFields from './components/PassInputFields'
 import LineBar from './components/LineBar'
 import SocialSignButton from './components/SocialSignButton'
 import StatusAlready from './components/StatusAlready'
+import { PRIMARY_COLOR } from '../colors/colors'
+import { app } from "../firebase-config"
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
+import { doc, getFirestore, setDoc } from 'firebase/firestore'
 
 const SignUpScreen = ({ navigation }) => {
-  const [visiblePasswordEye, setVisiblePasswordEye] = useState(true);
-  const [visibleConfirmPasswordEye, setvisibleConfirmPasswordEye] = useState(false)
+  const [visiblePasswordEye, setVisiblePasswordEye] = useState(false);
+  const [visibleConfirmPasswordEye, setVisibleConfirmPasswordEye] = useState(false);
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const auth = getAuth(app)
+  const db = getFirestore();
 
-  const onPressSignUp = () => {
-    console.log(password)
+  const onPressSignUp = async (email, password) => {
+    console.log("authSignUp: ", auth);
+    if (email === '' || password === '' || fullName === '') {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords don't match");
+      return;
+    }
+    else {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password, fullName)
+        const user = auth.currentUser
+        if (user) {
+          await setDoc(doc(db, "Users", user.uid), {
+            fullName,
+            email
+          })
+        }
+        console.log("current User: ", user);
+        navigation.navigate("HomeScreen")
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Signup Failed", error.message)
+      }
+    }
   }
   return (
     <View style={styles.container}>
@@ -28,37 +59,27 @@ const SignUpScreen = ({ navigation }) => {
         </View>
         <View style={styles.inputField_container} >
           <View >
-            {/* <Text style={{ marginLeft: 12, fontSize: 17 }}>Full Name</Text> */}
-            {/* <TextInput
-              value={fullName}
-              onChangeText={(fullName) => setFullName(fullName)}
-              placeholder='your name here...'
-              style={styles.email_textInput_field}
-            /> */}
-            <TextInputFields label={'Full Name'} placeholder={'your name here...'} style={{ width: 300 }} />
+
+            <TextInputFields fullName={fullName} label={'Full Name'} onChangeText={(text) => setFullName(text)} placeholder={'your name here...'} style={{ width: 300 }} />
           </View>
 
           <View >
-            {/* <Text style={{ marginLeft: 12, fontSize: 17 }}>Email</Text>
-            <TextInput
-              value={email}
-              onChangeText={(email) => setEmail(email)}
-              placeholder='your email here...'
-              style={styles.email_textInput_field}
-            /> */}
-            <TextInputFields label={'Email'} placeholder={'your email here'} style={{ width: 300 }} />
+
+            <TextInputFields email={email} label={'Email'} onChangeText={(text) => setEmail(text)} placeholder={'your email here'} style={{ width: 300 }} />
           </View>
           <View >
-            <PassInputFields label={'Password'} placeholder={'your password'} style={{ width: 300 }} />
+            <PassInputFields visiblePasswordEye={visiblePasswordEye}
+              setVisiblePasswordEye={setVisiblePasswordEye} password={password} onChangeText={(text) => setPassword(text)} label={'Password'} placeholder={'your password'} style={{ width: 300 }} />
           </View>
           <View >
-            <PassInputFields label={'Confirm Password'} placeholder={'your confirm password'} style={{ width: 300 }} />
+            <PassInputFields visiblePasswordEye={visibleConfirmPasswordEye}
+              setVisiblePasswordEye={setVisibleConfirmPasswordEye} confirmPassword={confirmPassword} label={'Confirm Password'} onChangeText={(text) => setConfirmPassword(text)} placeholder={'your confirm password'} style={{ width: 300 }} />
 
           </View>
 
         </View>
         <View >
-          <TouchableOpacity onPress={onPressSignUp} style={{ borderRadius: 10, borderWidth: 1, backgroundColor: '#000000', height: 40, justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: '#ffffff', fontSize: 20 }}>Sign Up</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => onPressSignUp(email, password, fullName)} style={{ borderRadius: 10, borderWidth: 1, backgroundColor: PRIMARY_COLOR, height: 40, justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: '#ffffff', fontSize: 20 }}>Sign Up</Text></TouchableOpacity>
         </View>
         <LineBar text={'or Sign Up with'} />
 
